@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import type { DecodedIdToken } from 'firebase-admin/auth';
-import { adminAuth } from './firebaseAdmin.js';
+import { adminAuth, ConfigError } from './firebaseAdmin.js';
 
 export function json(res: VercelResponse, status: number, body: unknown) {
   res.status(status).setHeader('Content-Type', 'application/json');
@@ -36,7 +36,8 @@ export async function requireUser(
     auth = adminAuth();
   } catch (err) {
     console.error('[auth] Firebase Admin init failed:', err instanceof Error ? err.message : err);
-    json(res, 500, { error: 'Server is not configured correctly.' });
+    const detail = err instanceof ConfigError ? ` (${err.message})` : '';
+    json(res, 500, { error: `Server is not configured correctly${detail}.` });
     return null;
   }
   try {
