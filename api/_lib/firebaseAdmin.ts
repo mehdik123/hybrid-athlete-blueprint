@@ -40,7 +40,16 @@ function describeKey(): string {
   const text = clean(process.env.FIREBASE_PRIVATE_KEY);
   const begin = text.includes(BEGIN) ? 'yes' : 'no';
   const end = text.includes(END) ? 'yes' : 'no';
-  return `${text.length} chars, BEGIN marker ${begin}, END marker ${end}; a full key is about 1700 chars`;
+  const body = text
+    .replace(/-----(BEGIN|END)[A-Z ]*-----/g, '')
+    .replace(/\\+n/g, '')
+    .replace(/[^A-Za-z0-9+/=]/g, '');
+  const header = body.startsWith('MIIE') ? 'standard' : 'unexpected';
+  return (
+    `${text.length} chars pasted, BEGIN marker ${begin}, END marker ${end}; ` +
+    `base64 body ${body.length} chars (length mod 4 = ${body.length % 4}, ` +
+    `header ${header}); a full key body is about 1624 chars`
+  );
 }
 
 function getAdminApp(): App {
@@ -65,8 +74,13 @@ function getAdminApp(): App {
       credential: cert({ projectId, clientEmail, privateKey: key }),
     });
   } catch (err) {
-    console.error('[firebaseAdmin] cert() failed:', err instanceof Error ? err.message : err);
-    throw new ConfigError(`FIREBASE_PRIVATE_KEY is not a valid private key: ${describeKey()}`);
+    const reason = err instanceof Error ? err.message.slice(0, 200) : String(err).slice(0, 200);
+    console.error('[firebaseAdmin] cert() failed:', reason);
+    const emailOk = clientEmail.endsWith('.iam.gserviceaccount.com') ? 'ok' : 'unexpected format';
+    throw new ConfigError(
+      `FIREBASE_PRIVATE_KEY is not a valid private key: ${describeKey()}; ` +
+        `client email ${emailOk}; parser said: ${reason}`
+    );
   }
 }
 
