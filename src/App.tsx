@@ -25,6 +25,8 @@ import { useLanguage } from './contexts/LanguageContext';
 import { useAuth } from './contexts/AuthContext';
 import { isTimeoutError } from './lib/firebase';
 import { Button, ScreenTransition, WorkoutFeedSkeleton, Skeleton } from './components/ui';
+import { useAccess } from './hooks/useAccess';
+import AccessCodeScreen from './components/AccessCodeScreen';
 import { listVariants } from './design/motion';
 import { motion } from 'framer-motion';
 
@@ -37,6 +39,7 @@ function App() {
   const navigate = useNavigate();
   const { user, profile, signUp, loading } = useAuth();
   const { t } = useLanguage();
+  const access = useAccess();
 
   /** Week the user is browsing (may be a completed past week). */
   const [viewingWeek, setViewingWeek] = useState(1);
@@ -204,6 +207,28 @@ function App() {
   const handleLockedWeek = (week: number) => {
     setLockedWeekTarget(week);
   };
+
+  if (user && access.checking) {
+    return (
+      <div className="min-h-dvh bg-app pad-safe-top px-6 py-12">
+        <div className="mx-auto max-w-md space-y-6">
+          <Skeleton className="mx-auto h-16 w-16 rounded-2xl" />
+          <Skeleton className="h-8 w-3/4 rounded-xl" />
+          <Skeleton className="h-12 w-full rounded-2xl" />
+        </div>
+      </div>
+    );
+  }
+
+  if (user && !access.hasAccess) {
+    return (
+      <AccessCodeScreen
+        onRedeem={access.redeem}
+        error={access.error}
+        onError={access.setError}
+      />
+    );
+  }
 
   // Individual workout page - restricted to authenticated users
   if (selectedWorkout) {

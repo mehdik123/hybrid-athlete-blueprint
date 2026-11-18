@@ -10,6 +10,7 @@ import './index.css';
 
 const App = lazy(() => import('./App.tsx'));
 const LoginPage = lazy(() => import('./components/LoginPage.tsx'));
+const AdminCodesPage = lazy(() => import('./components/AdminCodesPage.tsx'));
 
 function Root() {
   useEffect(() => initKeyboardViewport(), []);
@@ -20,6 +21,7 @@ function Root() {
           <Suspense fallback={<PageLoader />}>
             <Routes>
               <Route path="/" element={<App />} />
+              <Route path="/admin/codes" element={<AdminCodesPage />} />
               <Route path="/nutrition/*" element={<Navigate to="/" replace />} />
               <Route path="/login/returning" element={<LoginPage />} />
               <Route path="/login/:userId" element={<LoginPage />} />

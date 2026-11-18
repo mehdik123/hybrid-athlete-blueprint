@@ -18,16 +18,7 @@ Authentication → Sign-in method → **Email/Password** → Enable
 
 Build → Firestore Database → Create database → start in **production** mode, then paste these rules:
 
-```
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /profiles/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-  }
-}
-```
+Paste the rules from `firebase/firestore.rules`. Clients may only read/write their own `profiles/{uid}`. They cannot read or write `users`, `access_codes`, or `redeemed_codes`, and they cannot set `hasAccess`.
 
 Do **not** store workout sets in Firestore.
 
