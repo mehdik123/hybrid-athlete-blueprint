@@ -18,6 +18,22 @@ const BEGIN = '-----BEGIN PRIVATE KEY-----';
 const END = '-----END PRIVATE KEY-----';
 
 /**
+ * Extract just the base64 body of the key. Markers may be missing, newlines may
+ * be real or written as "\n" (base64 never contains a backslash), and stray
+ * characters may precede the key. Google service account keys are PKCS#8 RSA
+ * keys, whose base64 always starts with "MIIE", so anything before that is junk
+ * (for example the "n" left over from a deleted "\n").
+ */
+function keyBody(text: string): string {
+  const body = text
+    .replace(/-----(BEGIN|END)[A-Z ]*-----/g, '')
+    .replace(/\\+n/g, '')
+    .replace(/[^A-Za-z0-9+/=]/g, '');
+  const start = body.indexOf('MIIE');
+  return start > 0 ? body.slice(start) : body;
+}
+
+/**
  * Rebuild a clean PEM from whatever was pasted: real newlines, literal "\n",
  * newlines collapsed to spaces, quotes, trailing commas, etc.
  */
@@ -26,10 +42,7 @@ function privateKey(): string {
   // Drop BEGIN/END markers if present (they may also be missing entirely),
   // then keep only the base64 body. Base64 never contains a backslash, so any
   // "\n" text is an escaped newline.
-  const body = text
-    .replace(/-----(BEGIN|END)[A-Z ]*-----/g, '')
-    .replace(/\\+n/g, '')
-    .replace(/[^A-Za-z0-9+/=]/g, '');
+  const body = keyBody(text);
   if (!body) return '';
   const lines = body.match(/.{1,64}/g) ?? [];
   return `${BEGIN}\n${lines.join('\n')}\n${END}\n`;
@@ -40,10 +53,7 @@ function describeKey(): string {
   const text = clean(process.env.FIREBASE_PRIVATE_KEY);
   const begin = text.includes(BEGIN) ? 'yes' : 'no';
   const end = text.includes(END) ? 'yes' : 'no';
-  const body = text
-    .replace(/-----(BEGIN|END)[A-Z ]*-----/g, '')
-    .replace(/\\+n/g, '')
-    .replace(/[^A-Za-z0-9+/=]/g, '');
+  const body = keyBody(text);
   const header = body.startsWith('MIIE') ? 'standard' : 'unexpected';
   return (
     `${text.length} chars pasted, BEGIN marker ${begin}, END marker ${end}; ` +
