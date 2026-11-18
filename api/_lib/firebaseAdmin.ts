@@ -23,10 +23,14 @@ const END = '-----END PRIVATE KEY-----';
  */
 function privateKey(): string {
   const text = clean(process.env.FIREBASE_PRIVATE_KEY);
-  const match = text.match(/-----BEGIN PRIVATE KEY-----([\s\S]*?)-----END PRIVATE KEY-----/);
-  if (!match) return text.replace(/\\n/g, '\n');
-  // Base64 never contains a backslash, so any "\n" text here is an escaped newline.
-  const body = match[1].replace(/\\+n/g, '').replace(/[^A-Za-z0-9+/=]/g, '');
+  // Drop BEGIN/END markers if present (they may also be missing entirely),
+  // then keep only the base64 body. Base64 never contains a backslash, so any
+  // "\n" text is an escaped newline.
+  const body = text
+    .replace(/-----(BEGIN|END)[A-Z ]*-----/g, '')
+    .replace(/\\+n/g, '')
+    .replace(/[^A-Za-z0-9+/=]/g, '');
+  if (!body) return '';
   const lines = body.match(/.{1,64}/g) ?? [];
   return `${BEGIN}\n${lines.join('\n')}\n${END}\n`;
 }
