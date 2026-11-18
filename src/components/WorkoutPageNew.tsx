@@ -24,7 +24,7 @@ import { getPhase, isDeloadWeek, TOTAL_WEEKS } from '../data/programConfig';
 import { useLanguage } from '../contexts/LanguageContext';
 import { dayName } from '../i18n/content';
 import { ProgressRing, Button, StatCounter } from './ui';
-import { listVariants } from '../design/motion';
+import { listVariants, spring } from '../design/motion';
 import { celebrateWeekUnlock } from '../lib/celebration';
 
 interface WorkoutPageNewProps {
@@ -174,7 +174,7 @@ export default function WorkoutPageNew({
 
   return (
     <div className="min-h-dvh bg-bg text-txt-hi">
-      <div className="sticky top-0 z-40 bg-bg/94 pad-safe-top">
+      <div className="glass-bar sticky top-0 z-40 border-b border-hair/60 pad-safe-top">
         <div className="mx-auto max-w-lg px-5 py-3">
           <div className="flex items-center justify-between gap-3">
             <div className="min-w-0 flex-1">
@@ -206,7 +206,7 @@ export default function WorkoutPageNew({
 
       <div className="mx-auto max-w-lg space-y-3 px-5 pb-[calc(6.5rem+env(safe-area-inset-bottom))] pt-2">
         {!dayComplete && (
-          <div className="rounded-[18px] bg-surface-1 p-4">
+          <div className="surface-premium rounded-[20px] p-4">
             <p className="text-[13px] leading-relaxed text-txt-mid">{t('log.confirmDayHint')}</p>
             <Button
               variant="primary"
@@ -222,12 +222,17 @@ export default function WorkoutPageNew({
         )}
 
         {dayComplete && (
-          <div className="flex items-center gap-2 rounded-[18px] bg-surface-1 px-4 py-3.5 text-[13px] font-medium text-txt-mid">
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={spring.gentle}
+            className="surface-premium flex items-center gap-2 rounded-[20px] px-4 py-3.5 text-[13px] font-medium text-txt-mid"
+          >
             <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-brand">
               {t('workout.done')}
             </span>
             <span>{t('log.dayConfirmed')}</span>
-          </div>
+          </motion.div>
         )}
 
         <motion.div className="space-y-3" variants={listVariants} initial="hidden" animate="show">
@@ -254,22 +259,27 @@ export default function WorkoutPageNew({
             exit={{ opacity: 0 }}
             transition={{ duration: 0.22 }}
           >
-            <div className="absolute inset-0 bg-[rgba(8,8,7,0.72)]" />
+            <div className="absolute inset-0 bg-[rgba(8,8,7,0.72)] backdrop-blur-sm" />
             <motion.div
               initial={{ y: '100%' }}
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
-              transition={{ duration: 0.38, ease: [0.2, 0.8, 0.2, 1] }}
-              className="absolute inset-x-0 bottom-0 z-10 mx-auto max-w-lg rounded-t-[28px] bg-surface-1 px-6 pb-[max(2.25rem,env(safe-area-inset-bottom))] pt-3 shadow-[0_-1px_0_#2E2C29]"
+              transition={spring.smooth}
+              className="surface-premium absolute inset-x-0 bottom-0 z-10 mx-auto max-w-lg rounded-t-[28px] px-6 pb-[max(2.25rem,env(safe-area-inset-bottom))] pt-3 shadow-[0_-1px_0_#2E2C29]"
             >
               <div className="mx-auto mb-[22px] h-1 w-[38px] rounded-sm bg-hair-strong" />
 
               <div className="flex items-end gap-4">
-                <span className="font-display text-[clamp(5.5rem,22vw,8rem)] font-bold leading-[0.74] tracking-[-0.03em] tabular-nums text-txt-hi">
+                <motion.span
+                  initial={{ scale: 0.5, opacity: 0, rotate: -6 }}
+                  animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                  transition={{ ...spring.snappy, delay: 0.25 }}
+                  className="origin-bottom-left font-display text-[clamp(5.5rem,22vw,8rem)] font-bold leading-[0.74] tracking-[-0.03em] tabular-nums text-txt-hi drop-shadow-[0_0_28px_rgba(232,17,45,0.45)]"
+                >
                   {celebration.final
                     ? String(TOTAL_WEEKS).padStart(2, '0')
                     : String(celebration.week).padStart(2, '0')}
-                </span>
+                </motion.span>
                 <div className="pb-1">
                   <div className="text-[12px] font-semibold uppercase tracking-[0.16em] text-txt-lo">
                     {celebration.final ? t('unlock.finalLabel') : t('unlock.unlocked')}
@@ -318,15 +328,18 @@ export default function WorkoutPageNew({
                       { icon: Dumbbell, text: t('unlock.point2') },
                       { icon: Lock, text: t('unlock.point3') },
                     ].map(({ icon: Icon, text }, idx, arr) => (
-                      <div
+                      <motion.div
                         key={idx}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ ...spring.gentle, delay: 0.5 + idx * 0.1 }}
                         className={`flex gap-3 py-[13px] text-sm font-medium leading-5 text-txt-hi ${
                           idx < arr.length - 1 ? 'border-b border-hair' : ''
                         }`}
                       >
-                        <Icon className="mt-px h-4 w-4 shrink-0 text-txt-mid" strokeWidth={1.75} />
+                        <Icon className="mt-px h-4 w-4 shrink-0 text-brand" strokeWidth={1.75} />
                         <span>{text}</span>
-                      </div>
+                      </motion.div>
                     ))}
                   </div>
                 </>

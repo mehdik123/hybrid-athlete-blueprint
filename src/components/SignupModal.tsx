@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { X, Loader2, User, Mail, KeyRound, CalendarDays, Check, Lock } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Button, Input, Field, IconButton, BrandMark } from './ui';
-import { celebrateVariants } from '../design/motion';
+import { spring } from '../design/motion';
 import { AVAILABLE_DAYS_PER_WEEK, DaysPerWeek } from '../data/workoutData';
 
 interface SignupModalProps {
@@ -72,10 +72,10 @@ export default function SignupModal({ onClose, onSubmit, loading }: SignupModalP
       <div className="pointer-events-none absolute left-1/2 top-1/2 aspect-square w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-soft blur-[120px]" />
 
       <motion.div
-        variants={celebrateVariants}
-        initial="hidden"
-        animate="show"
-        className="relative flex max-h-[92dvh] w-full max-w-md flex-col overflow-y-auto rounded-t-3xl border border-hair bg-surface-1 p-5 shadow-soft sm:max-h-none sm:rounded-3xl sm:p-7 md:p-8"
+        initial={{ opacity: 0, y: 48, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={spring.smooth}
+        className="surface-premium relative flex max-h-[92dvh] w-full max-w-md flex-col overflow-y-auto rounded-t-3xl p-5 sm:max-h-none sm:rounded-3xl sm:p-7 md:p-8"
         style={{ paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom))' }}
       >
         <div className="mb-5 flex items-start justify-between sm:mb-7">
@@ -148,36 +148,49 @@ export default function SignupModal({ onClose, onSubmit, loading }: SignupModalP
                 const available = AVAILABLE_DAYS_PER_WEEK.includes(d);
                 const selected = daysPerWeek === d;
                 return (
-                  <button
+                  <motion.button
                     key={d}
                     type="button"
                     disabled={!available}
                     onClick={() => available && setDaysPerWeek(d)}
+                    whileTap={available ? { scale: 0.95 } : undefined}
+                    transition={spring.snappy}
                     className={[
-                      'relative flex flex-col items-center justify-center gap-0.5 rounded-2xl border px-2 py-3 transition-all',
-                      selected
-                        ? 'border-brand bg-brand-soft shadow-red'
-                        : 'border-hair bg-surface-2',
+                      'relative flex flex-col items-center justify-center gap-0.5 rounded-2xl border px-2 py-3 transition-colors duration-200',
+                      selected ? 'border-transparent' : 'border-hair bg-surface-2',
                       available ? 'hover:border-brand/50' : 'cursor-not-allowed opacity-55',
                     ].join(' ')}
                   >
                     {selected && (
-                      <span className="absolute right-1.5 top-1.5 grid h-4 w-4 place-items-center rounded-full bg-brand text-white">
+                      <motion.span
+                        layoutId="day-select"
+                        className="absolute inset-0 rounded-2xl border border-brand bg-brand-soft shadow-[0_10px_24px_-12px_rgba(232,17,45,0.8)]"
+                        transition={spring.snappy}
+                        aria-hidden
+                      />
+                    )}
+                    {selected && (
+                      <motion.span
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={spring.snappy}
+                        className="absolute right-1.5 top-1.5 z-10 grid h-4 w-4 place-items-center rounded-full bg-brand text-white"
+                      >
                         <Check className="h-2.5 w-2.5" />
-                      </span>
+                      </motion.span>
                     )}
                     {!available && (
                       <Lock className="absolute right-1.5 top-1.5 h-3 w-3 text-txt-lo" />
                     )}
                     <span
-                      className={`stat text-2xl font-black leading-none ${selected ? 'text-brand' : 'text-txt-hi'}`}
+                      className={`stat relative text-2xl font-black leading-none transition-colors duration-200 ${selected ? 'text-brand' : 'text-txt-hi'}`}
                     >
                       {d}
                     </span>
-                    <span className="text-[8px] font-bold uppercase tracking-wider text-txt-lo">
+                    <span className="relative text-[8px] font-bold uppercase tracking-wider text-txt-lo">
                       {available ? t('signup.days.perWeek') : t('signup.days.comingSoon')}
                     </span>
-                  </button>
+                  </motion.button>
                 );
               })}
             </div>
@@ -189,7 +202,8 @@ export default function SignupModal({ onClose, onSubmit, loading }: SignupModalP
           {error && (
             <motion.div
               initial={{ opacity: 0, y: -4 }}
-              animate={{ opacity: 1, y: 0 }}
+              animate={{ opacity: 1, y: 0, x: [0, -6, 5, -3, 0] }}
+              transition={{ duration: 0.4 }}
               className="rounded-2xl border border-brand/20 bg-brand-soft p-3"
             >
               <p className="text-[11px] font-bold uppercase tracking-tight text-brand">{error}</p>

@@ -210,11 +210,6 @@ export default function ProgramIntro({ onStart, daysPerWeek }: ProgramIntroProps
                                 }}
                                 className="relative overflow-hidden px-10 tracking-[0.25em] md:min-w-[20rem]"
                             >
-                                <motion.span
-                                    className="pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                                    animate={{ x: ['-120%', '120%'] }}
-                                    transition={{ duration: 2.5, repeat: Infinity, ease: 'linear', repeatDelay: 1 }}
-                                />
                                 <span className="relative flex items-center justify-center gap-2">
                                     {t('intro.accessProgram')}
                                     <ChevronRight className="h-4 w-4 rtl:rotate-180" />

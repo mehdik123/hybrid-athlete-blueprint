@@ -24,7 +24,14 @@ import BottomNav from './components/BottomNav';
 import { useLanguage } from './contexts/LanguageContext';
 import { useAuth } from './contexts/AuthContext';
 import { isTimeoutError } from './lib/firebase';
-import { Button, ScreenTransition, WorkoutFeedSkeleton, Skeleton } from './components/ui';
+import {
+  Button,
+  ScreenTransition,
+  WorkoutFeedSkeleton,
+  Skeleton,
+  StatCounter,
+  AnimatedProgress,
+} from './components/ui';
 import { useAccess } from './hooks/useAccess';
 import AccessCodeScreen from './components/AccessCodeScreen';
 import { listVariants } from './design/motion';
@@ -342,9 +349,11 @@ function App() {
 
                 <div className="flex items-end justify-between gap-3">
                   <div className="flex items-end gap-2.5">
-                    <span className="font-display text-[84px] font-bold leading-[0.78] tracking-[-0.02em] tabular-nums text-txt-hi">
-                      {String(viewingWeek).padStart(2, '0')}
-                    </span>
+                    <StatCounter
+                      value={viewingWeek}
+                      format={(n) => String(n).padStart(2, '0')}
+                      className="font-display text-[84px] font-bold leading-[0.78] tracking-[-0.02em] tabular-nums text-txt-hi"
+                    />
                     <span className="pb-1.5 text-[13px] font-semibold uppercase tracking-[0.16em] text-txt-lo">
                       {t('workout.week')}
                     </span>
@@ -376,17 +385,12 @@ function App() {
                       const pct = total > 0 ? Math.round((done / total) * 100) : 0;
                       return (
                         <div>
-                          <div className="mt-[18px] h-1 overflow-hidden rounded-sm bg-surface-3">
-                            <div
-                              className="h-full rounded-sm bg-brand transition-[width] duration-500"
-                              style={{ width: `${pct}%` }}
-                            />
-                          </div>
+                          <AnimatedProgress value={pct} height="h-1.5" className="mt-[18px]" />
                           <div className="mt-2.5 flex justify-between text-[13px] font-medium text-txt-mid">
                             <span>
-                              {done} of {total} sets
+                              <StatCounter value={done} className="font-sans tracking-normal" /> of {total} sets
                             </span>
-                            <span className="text-txt-lo">{pct}%</span>
+                            <span className="tabular-nums text-txt-lo">{pct}%</span>
                           </div>
                         </div>
                       );

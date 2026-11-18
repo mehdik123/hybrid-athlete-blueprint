@@ -18,3 +18,5 @@ export type { StatStripItem } from './StatStrip';
 export { Input, Field } from './Input';
 export { BrandMark } from './BrandMark';
 export { VideoModal } from './VideoModal';
+export { Reveal } from './Reveal';
+export { AnimatedProgress } from './AnimatedProgress';

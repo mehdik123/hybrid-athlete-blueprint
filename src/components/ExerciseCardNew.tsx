@@ -1,5 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Check, Loader2, Play, Timer, Minus, Plus } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { itemVariants, spring } from '../design/motion';
 import { Exercise, ExerciseSet } from '../types/workout';
 import { useLanguage } from '../contexts/LanguageContext';
 import { exerciseName, localizeMinutes } from '../i18n/content';
@@ -134,7 +136,7 @@ export default function ExerciseCardNew({
   };
 
   return (
-    <div className="rounded-[18px] bg-surface-1 p-4">
+    <motion.div variants={itemVariants} className="group surface-premium rounded-[20px] p-4">
       <div className="flex items-baseline gap-3">
         <span className="font-display text-lg font-semibold tabular-nums text-brand">
           {String(index + 1).padStart(2, '0')}
@@ -166,7 +168,7 @@ export default function ExerciseCardNew({
           <img
             src={cover}
             alt=""
-            className="h-full w-full object-cover"
+            className="h-full w-full object-cover transition-transform duration-[900ms] ease-smooth group-hover:scale-[1.06]"
             style={{ objectPosition: '50% 20%', filter: 'saturate(0.75) brightness(0.7)' }}
             loading="lazy"
             onError={() => setCoverIndex((i) => i + 1)}
@@ -174,20 +176,31 @@ export default function ExerciseCardNew({
         ) : (
           <div className="h-full bg-surface-2" />
         )}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(17,17,16,0)_45%,rgba(17,17,16,0.7)_100%)]"
+        />
         {exercise.videoUrl && (
-          <button
+          <motion.button
             type="button"
             onClick={() => {
               haptic.light();
               setShowVideo(true);
             }}
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.92 }}
+            transition={spring.snappy}
             aria-label={t('log.playVideo', { name: localizedName })}
-            className="absolute left-1/2 top-1/2 grid h-[52px] w-[52px] -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-[rgba(242,237,230,0.94)] text-[#111]"
+            className="absolute inset-0 m-auto grid h-[52px] w-[52px] place-items-center rounded-full bg-[rgba(242,237,230,0.94)] text-[#111] shadow-[0_10px_28px_-8px_rgba(0,0,0,0.7)]"
           >
-            <Play className="h-5 w-5 fill-current" />
-          </button>
+            <span
+              aria-hidden
+              className="absolute inset-0 animate-ping rounded-full bg-[rgba(242,237,230,0.28)] [animation-duration:2.6s]"
+            />
+            <Play className="relative h-5 w-5 fill-current" />
+          </motion.button>
         )}
-        <span className="absolute bottom-3 left-3 h-[26px] rounded-lg bg-[rgba(17,17,16,0.72)] px-2.5 text-[12px] font-semibold leading-[26px] text-txt-hi">
+        <span className="absolute bottom-3 left-3 h-[26px] rounded-lg bg-[rgba(17,17,16,0.72)] px-2.5 text-[12px] font-semibold leading-[26px] text-txt-hi backdrop-blur-md">
           {t('log.set')} {sets.length}
         </span>
       </div>
@@ -228,8 +241,19 @@ export default function ExerciseCardNew({
                 set.completed && 'opacity-90'
               )}
             >
-              <span className="text-center font-display text-lg font-semibold tabular-nums text-txt-mid">
-                {set.setNumber}
+              <span className="relative grid place-items-center">
+                <motion.span
+                  key={set.completed ? 'done' : 'todo'}
+                  initial={set.completed ? { scale: 0.4, opacity: 0 } : false}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={spring.snappy}
+                  className={cn(
+                    'grid h-7 w-7 place-items-center rounded-full font-display text-lg font-semibold tabular-nums transition-colors duration-300',
+                    set.completed ? 'bg-success/15 text-success' : 'text-txt-mid'
+                  )}
+                >
+                  {set.setNumber}
+                </motion.span>
               </span>
               <span className="text-sm font-medium text-txt-mid">{tg}</span>
               {showWeight ? (
@@ -272,9 +296,14 @@ export default function ExerciseCardNew({
         {isSaving ? (
           <Loader2 className="h-5 w-5 animate-spin" />
         ) : isSaved ? (
-          <>
-            <Check className="h-5 w-5" strokeWidth={2} /> {t('log.saved')}
-          </>
+          <motion.span
+            initial={{ scale: 0.85, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={spring.snappy}
+            className="inline-flex items-center gap-2"
+          >
+            <Check className="h-5 w-5" strokeWidth={2.4} /> {t('log.saved')}
+          </motion.span>
         ) : savedSets?.length ? (
           t('log.update')
         ) : (
@@ -288,7 +317,7 @@ export default function ExerciseCardNew({
         title={localizedName}
         onClose={() => setShowVideo(false)}
       />
-    </div>
+    </motion.div>
   );
 }
 
@@ -315,9 +344,10 @@ function Cell({
     <div
       className={cn(
         'relative grid h-12 place-items-center rounded-[10px] font-display text-2xl font-semibold tabular-nums',
-        done ? 'bg-surface-3 text-txt-hi' : 'bg-surface-2 text-txt-hi',
+        'transition-[background-color,box-shadow] duration-200',
+        done ? 'bg-surface-3 text-txt-hi' : 'bg-surface-2 text-txt-hi hover:bg-surface-3',
         empty && !focused && 'text-txt-lo',
-        focused && 'bg-surface-1 shadow-[inset_0_0_0_1.5px_#E8112D]'
+        focused && 'bg-surface-1 shadow-[inset_0_0_0_1.5px_#E8112D,0_0_0_4px_rgba(232,17,45,0.12)]'
       )}
     >
       <input

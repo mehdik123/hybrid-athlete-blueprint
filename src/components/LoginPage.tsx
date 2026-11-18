@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { itemVariants, listVariants } from '../design/motion';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
 import { Button, Eyebrow, Input, Field, IconButton } from './ui';
@@ -65,24 +67,35 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative min-h-dvh w-full bg-bg text-txt-hi">
-      <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col px-6 pb-6 pt-[max(0.75rem,env(safe-area-inset-top))]">
-        <div className="flex items-center justify-between">
+    <div className="relative min-h-dvh w-full overflow-hidden bg-app text-txt-hi">
+      <motion.div
+        aria-hidden
+        className="pointer-events-none absolute -top-24 left-1/2 h-72 w-[120%] -translate-x-1/2 rounded-full bg-brand/15 blur-[100px]"
+        animate={{ opacity: [0.35, 0.7, 0.35] }}
+        transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+      />
+      <motion.div
+        variants={listVariants}
+        initial="hidden"
+        animate="show"
+        className="relative mx-auto flex min-h-dvh w-full max-w-md flex-col px-6 pb-6 pt-[max(0.75rem,env(safe-area-inset-top))]"
+      >
+        <motion.div variants={itemVariants} className="flex items-center justify-between">
           <IconButton aria-label={t('common.back')} onClick={() => navigate('/')}>
             <ArrowLeft className="h-5 w-5 rtl:rotate-180" strokeWidth={1.75} />
           </IconButton>
           <LanguageToggle />
-        </div>
+        </motion.div>
 
-        <div className="mt-7">
+        <motion.div variants={itemVariants} className="mt-7">
           <Eyebrow>{t('login.eyebrow')}</Eyebrow>
           <h1 className="mt-4 font-display text-[46px] font-semibold uppercase leading-none tracking-tight text-txt-hi">
             {t('common.login')}
           </h1>
           <p className="mt-2.5 text-[15px] leading-[22px] text-txt-mid">{t('login.lead')}</p>
-        </div>
+        </motion.div>
 
-        <form onSubmit={handleLogin} className="mt-8 grid gap-[18px]">
+        <motion.form variants={itemVariants} onSubmit={handleLogin} className="mt-8 grid gap-[18px]">
           <Field label={t('signup.email')} htmlFor="login-email" error={error && !password ? error : undefined}>
             <Input
               id="login-email"
@@ -136,7 +149,14 @@ export default function LoginPage() {
           </div>
 
           {error && (
-            <p className="text-[13px] font-medium text-brand">{error}</p>
+            <motion.p
+              initial={{ opacity: 0, x: -6 }}
+              animate={{ opacity: 1, x: [0, -6, 5, -3, 0] }}
+              transition={{ duration: 0.4 }}
+              className="text-[13px] font-medium text-brand"
+            >
+              {error}
+            </motion.p>
           )}
           {resetSent && (
             <p className="text-[13px] font-medium text-txt-mid">{t('login.resetSent')}</p>
@@ -145,19 +165,22 @@ export default function LoginPage() {
           <Button type="submit" fullWidth size="lg" disabled={loading} className="mt-2">
             {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : t('common.login')}
           </Button>
-        </form>
+        </motion.form>
 
-        <p className="mt-auto pb-[max(2rem,env(safe-area-inset-bottom))] pt-10 text-center text-sm font-medium text-txt-lo">
+        <motion.p
+          variants={itemVariants}
+          className="mt-auto pb-[max(2rem,env(safe-area-inset-bottom))] pt-10 text-center text-sm font-medium text-txt-lo"
+        >
           {t('login.newHere')}
           <button
             type="button"
             onClick={() => navigate('/')}
-            className="ml-1.5 font-semibold text-txt-hi"
+            className="ml-1.5 font-semibold text-txt-hi underline decoration-brand decoration-2 underline-offset-4 transition-colors hover:text-brand"
           >
             {t('common.createAccount')}
           </button>
-        </p>
-      </div>
+        </motion.p>
+      </motion.div>
     </div>
   );
 }

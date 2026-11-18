@@ -1,4 +1,5 @@
 import { ArrowLeft, LogOut } from 'lucide-react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -13,11 +14,13 @@ interface AppChromeProps {
   className?: string;
 }
 
-/** Quiet top chrome: brand + language + logout. No pills / glow. */
+/** Frosted top chrome: the hairline fades in as the page scrolls under it. */
 export default function AppChrome({ showBack, onBack, className }: AppChromeProps) {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { t } = useLanguage();
+  const { scrollY } = useScroll();
+  const lineOpacity = useTransform(scrollY, [0, 28], [0, 1]);
 
   const handleLogout = async () => {
     haptic.light();
@@ -27,10 +30,7 @@ export default function AppChrome({ showBack, onBack, className }: AppChromeProp
 
   return (
     <header
-      className={cn(
-        'fixed inset-x-0 top-0 z-[200] w-full bg-bg/94 pad-safe-top',
-        className
-      )}
+      className={cn('glass-bar fixed inset-x-0 top-0 z-[200] w-full pad-safe-top', className)}
     >
       <div className="mx-auto flex h-[52px] max-w-lg items-center justify-between gap-3 px-5">
         <div className="flex min-w-0 flex-1 items-center gap-2">
@@ -42,7 +42,7 @@ export default function AppChrome({ showBack, onBack, className }: AppChromeProp
             <button
               type="button"
               onClick={() => navigate('/')}
-              className="min-w-0"
+              className="min-w-0 transition-opacity duration-200 hover:opacity-80 active:opacity-60"
               aria-label={t('nav.home')}
             >
               <BrandMark />
@@ -56,7 +56,7 @@ export default function AppChrome({ showBack, onBack, className }: AppChromeProp
             <button
               type="button"
               onClick={handleLogout}
-              className="grid h-10 w-10 place-items-center rounded-xl text-txt-lo transition-colors hover:bg-surface-1 hover:text-txt-hi"
+              className="grid h-10 w-10 place-items-center rounded-xl text-txt-lo transition-[background-color,color,transform] duration-200 hover:bg-surface-1 hover:text-txt-hi active:scale-90"
               aria-label={t('nav.logout')}
             >
               <LogOut className="h-4 w-4" strokeWidth={1.75} />
@@ -64,6 +64,11 @@ export default function AppChrome({ showBack, onBack, className }: AppChromeProp
           )}
         </div>
       </div>
+      <motion.div
+        style={{ opacity: lineOpacity }}
+        className="absolute inset-x-0 bottom-0 h-px bg-hair"
+        aria-hidden
+      />
     </header>
   );
 }

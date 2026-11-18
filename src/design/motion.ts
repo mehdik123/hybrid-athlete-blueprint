@@ -13,9 +13,9 @@ export const easeBase: Transition = { duration: tokens.base, ease: tokens.ease }
 export const easeFast: Transition = { duration: tokens.fast, ease: tokens.ease };
 
 export const screenVariants: Variants = {
-  hidden: { opacity: 0, y: 6 },
-  show: { opacity: 1, y: 0, transition: spring.gentle },
-  exit: { opacity: 0, y: -4, transition: { duration: 0.18, ease: tokens.ease } },
+  hidden: { opacity: 0, y: 12, scale: 0.992 },
+  show: { opacity: 1, y: 0, scale: 1, transition: spring.gentle },
+  exit: { opacity: 0, y: -6, scale: 0.996, transition: { duration: 0.16, ease: tokens.ease } },
 };
 
 export const listVariants: Variants = {
