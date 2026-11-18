@@ -31,10 +31,19 @@ export async function requireUser(
     json(res, 401, { error: 'Sign in required.' });
     return null;
   }
+  let auth: ReturnType<typeof adminAuth>;
   try {
-    const token = await adminAuth().verifyIdToken(match[1]);
+    auth = adminAuth();
+  } catch (err) {
+    console.error('[auth] Firebase Admin init failed:', err instanceof Error ? err.message : err);
+    json(res, 500, { error: 'Server is not configured correctly.' });
+    return null;
+  }
+  try {
+    const token = await auth.verifyIdToken(match[1]);
     return { uid: token.uid, email: token.email ?? null, token };
-  } catch {
+  } catch (err) {
+    console.error('[auth] verifyIdToken failed:', err instanceof Error ? err.message : err);
     json(res, 401, { error: 'Sign in required.' });
     return null;
   }
