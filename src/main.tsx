@@ -27,6 +27,7 @@ function Root() {
                 <Route path="/nutrition/*" element={<Navigate to="/" replace />} />
                 <Route path="/login/returning" element={<LoginPage />} />
                 <Route path="/login/:userId" element={<LoginPage />} />
+                <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </Suspense>
             <Toaster

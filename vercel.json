@@ -1,1 +1,7 @@
-{}
+{
+  "redirects": [
+    { "source": "/admin", "destination": "/#/admin/codes", "permanent": false },
+    { "source": "/admin/codes", "destination": "/#/admin/codes", "permanent": false },
+    { "source": "/admin/codes/", "destination": "/#/admin/codes", "permanent": false }
+  ]
+}
