@@ -126,14 +126,23 @@ export default function AdminCodesPage() {
               Access codes
             </h1>
           </div>
-          <button
-            type="button"
-            onClick={() => void signOut()}
-            className="inline-flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-[0.12em] text-txt-lo hover:text-txt-hi"
-          >
-            <LogOut className="h-3.5 w-3.5" />
-            Log out
-          </button>
+          <div className="flex items-center gap-4">
+            <button
+              type="button"
+              onClick={() => navigate('/')}
+              className="inline-flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-[0.12em] text-txt-lo hover:text-txt-hi"
+            >
+              App
+            </button>
+            <button
+              type="button"
+              onClick={() => void signOut()}
+              className="inline-flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-[0.12em] text-txt-lo hover:text-txt-hi"
+            >
+              <LogOut className="h-3.5 w-3.5" />
+              Log out
+            </button>
+          </div>
         </div>
 
         <form onSubmit={handleGenerate} className="mt-8 space-y-4 rounded-[18px] bg-surface-1 p-5">

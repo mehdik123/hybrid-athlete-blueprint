@@ -19,12 +19,12 @@ async function parseError(res: Response): Promise<string> {
   return 'Something went wrong. Try again.';
 }
 
-export async function fetchAccessStatus(): Promise<boolean> {
+export async function fetchAccessStatus(): Promise<{ hasAccess: boolean; isAdmin: boolean }> {
   const headers = await authHeader();
   const res = await fetch('/api/access-status', { method: 'GET', headers });
   if (!res.ok) throw new Error(await parseError(res));
-  const body = (await res.json()) as { hasAccess?: boolean };
-  return body.hasAccess === true;
+  const body = (await res.json()) as { hasAccess?: boolean; isAdmin?: boolean };
+  return { hasAccess: body.hasAccess === true, isAdmin: body.isAdmin === true };
 }
 
 export async function redeemAccessCode(code: string): Promise<void> {

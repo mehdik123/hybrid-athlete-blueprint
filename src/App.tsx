@@ -246,7 +246,7 @@ function App() {
     }
     return (
       <>
-        <AppChrome showBack onBack={() => setSelectedWorkout(null)} />
+        <AppChrome showBack onBack={() => setSelectedWorkout(null)} isAdmin={access.isAdmin} />
         <div className="pt-chrome">
           <Suspense fallback={<WorkoutFeedSkeleton />}>
             <WorkoutPageNew
@@ -299,7 +299,7 @@ function App() {
 
   return (
     <div className="min-h-dvh bg-app">
-      <AppChrome showBack={!isHome} onBack={handleChromeBack} />
+      <AppChrome showBack={!isHome} onBack={handleChromeBack} isAdmin={access.isAdmin} />
 
       <main className={`pt-chrome ${selectedWorkout ? 'pointer-events-none opacity-0' : 'opacity-100'}`}>
         <ScreenTransition screenKey={view}>

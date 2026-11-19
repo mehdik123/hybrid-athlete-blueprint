@@ -12,8 +12,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!user) return;
 
   try {
-    const hasAccess = await ensureGrandfathered(user.uid, user.email);
-    json(res, 200, { hasAccess });
+    const adminUid = process.env.ADMIN_UID;
+    const isAdmin = Boolean(adminUid) && user.uid === adminUid;
+    // The owner never sees the code screen.
+    const hasAccess = isAdmin || (await ensureGrandfathered(user.uid, user.email));
+    json(res, 200, { hasAccess, isAdmin });
   } catch (err) {
     console.error('[access-status]', err);
     json(res, 500, { error: 'Could not check access.' });

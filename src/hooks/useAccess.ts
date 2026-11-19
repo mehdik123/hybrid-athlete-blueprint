@@ -6,21 +6,25 @@ export function useAccess() {
   const { user, loading: authLoading } = useAuth();
   const [checking, setChecking] = useState(true);
   const [hasAccess, setHasAccess] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [error, setError] = useState('');
 
   const refresh = useCallback(async () => {
     if (!user) {
       setHasAccess(false);
+      setIsAdmin(false);
       setChecking(false);
       return;
     }
     setChecking(true);
     setError('');
     try {
-      const ok = await fetchAccessStatus();
-      setHasAccess(ok);
+      const status = await fetchAccessStatus();
+      setHasAccess(status.hasAccess);
+      setIsAdmin(status.isAdmin);
     } catch (err) {
       setHasAccess(false);
+      setIsAdmin(false);
       setError(err instanceof Error ? err.message : 'Could not check access.');
     } finally {
       setChecking(false);
@@ -41,6 +45,7 @@ export function useAccess() {
   return {
     checking: authLoading || checking,
     hasAccess,
+    isAdmin,
     error,
     setError,
     refresh,

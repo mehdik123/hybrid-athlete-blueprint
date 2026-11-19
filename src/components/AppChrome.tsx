@@ -1,4 +1,4 @@
-import { ArrowLeft, LogOut } from 'lucide-react';
+import { ArrowLeft, KeyRound, LogOut } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -12,10 +12,12 @@ interface AppChromeProps {
   showBack?: boolean;
   onBack?: () => void;
   className?: string;
+  /** Owner-only shortcut to the access-codes page. */
+  isAdmin?: boolean;
 }
 
 /** Frosted top chrome: the hairline fades in as the page scrolls under it. */
-export default function AppChrome({ showBack, onBack, className }: AppChromeProps) {
+export default function AppChrome({ showBack, onBack, className, isAdmin }: AppChromeProps) {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { t } = useLanguage();
@@ -52,6 +54,17 @@ export default function AppChrome({ showBack, onBack, className }: AppChromeProp
 
         <div className="flex shrink-0 items-center gap-3">
           <LanguageToggle />
+          {isAdmin && (
+            <button
+              type="button"
+              onClick={() => navigate('/admin/codes')}
+              className="inline-flex h-10 items-center gap-1.5 rounded-xl px-2.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-brand transition-[background-color,transform] duration-200 hover:bg-surface-1 active:scale-95"
+              aria-label="Admin codes"
+            >
+              <KeyRound className="h-4 w-4" strokeWidth={1.75} />
+              Admin
+            </button>
+          )}
           {user && (
             <button
               type="button"
