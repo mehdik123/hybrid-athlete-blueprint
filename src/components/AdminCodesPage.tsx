@@ -3,6 +3,7 @@ import { Copy, Loader2, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import {
+  AdminForbiddenError,
   disableAdminCode,
   fetchAdminCodes,
   generateAdminCode,
@@ -27,6 +28,7 @@ export default function AdminCodesPage() {
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [loadingList, setLoadingList] = useState(true);
+  const [forbidden, setForbidden] = useState(false);
 
   const load = async () => {
     setLoadingList(true);
@@ -34,6 +36,10 @@ export default function AdminCodesPage() {
     try {
       setCodes(await fetchAdminCodes());
     } catch (err) {
+      if (err instanceof AdminForbiddenError) {
+        setForbidden(true);
+        return;
+      }
       setError(err instanceof Error ? err.message : 'Could not load codes.');
     } finally {
       setLoadingList(false);
@@ -90,6 +96,22 @@ export default function AdminCodesPage() {
     return (
       <div className="min-h-dvh bg-app px-6 py-12 text-txt-mid">
         Loading…
+      </div>
+    );
+  }
+
+  if (forbidden) {
+    return (
+      <div className="flex min-h-dvh flex-col items-center justify-center gap-4 bg-app px-6 text-center text-txt-hi">
+        <p className="font-display text-3xl uppercase tracking-tight">Not allowed</p>
+        <p className="text-sm text-txt-mid">This page is for the site owner only.</p>
+        <button
+          type="button"
+          onClick={() => navigate('/')}
+          className="text-[12px] font-semibold uppercase tracking-[0.12em] text-txt-lo hover:text-txt-hi"
+        >
+          Back to app
+        </button>
       </div>
     );
   }

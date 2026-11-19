@@ -47,9 +47,12 @@ export type AdminCodeRow = {
   usedAt: string | null;
 };
 
+export class AdminForbiddenError extends Error {}
+
 export async function fetchAdminCodes(): Promise<AdminCodeRow[]> {
   const headers = await authHeader();
   const res = await fetch('/api/admin/codes', { method: 'GET', headers });
+  if (res.status === 403) throw new AdminForbiddenError('Not allowed.');
   if (!res.ok) throw new Error(await parseError(res));
   const body = (await res.json()) as { codes?: AdminCodeRow[] };
   return body.codes ?? [];
